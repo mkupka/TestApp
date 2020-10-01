@@ -21,7 +21,6 @@ class MainFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var scrollListener: RecyclerView.OnScrollListener
 
-
     companion object {
         fun newInstance() = MainFragment()
     }
@@ -63,7 +62,7 @@ class MainFragment : Fragment() {
             })
 
 
-        return inflater.inflate(R.layout.main_fragment, container, false)
+        return binding.root
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
