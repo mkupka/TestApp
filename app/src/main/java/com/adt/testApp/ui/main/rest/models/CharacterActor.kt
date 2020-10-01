@@ -6,6 +6,12 @@ class CharacterActor(
     val status: String,
     val species: String,
     val type: String,
-    val gender: String
+    val gender: String,
+    val image:String?
 ) {
+
+    val statusAndSpecies: String
+    get(){
+        return "Status: $status,  Species: $species"
+    }
 }

@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.adt.testApp.R
 import com.adt.testApp.databinding.ListItemCharacterActorBinding
 import com.adt.testApp.ui.main.rest.models.CharacterActor
+import com.squareup.picasso.Picasso
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -73,6 +74,11 @@ class CharacterActorListAdapter(val clickListener: CharacterActorListener) : Lis
         fun bind(clickListener: CharacterActorListener, item: CharacterActor) {
             binding.characterActor = item
             binding.clickListener = clickListener
+            //
+            // binding.
+            Picasso.get()
+                .load(item.image)
+                .into(binding.imageActor)
             binding.executePendingBindings()
         }
 
