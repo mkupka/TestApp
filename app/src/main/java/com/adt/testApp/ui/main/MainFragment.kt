@@ -1,23 +1,22 @@
 package com.adt.testApp.ui.main
 
-import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.NavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.adt.testApp.R
 import com.adt.testApp.databinding.MainFragmentBinding
+import com.adt.testApp.ui.main.rest.models.CharacterActor
 
 class MainFragment : Fragment() {
     private lateinit var linearLayoutManager: LinearLayoutManager
-    private lateinit var navController: NavController
     private lateinit var recyclerView: RecyclerView
     private lateinit var scrollListener: RecyclerView.OnScrollListener
 
@@ -48,10 +47,8 @@ class MainFragment : Fragment() {
         recyclerView.layoutManager = linearLayoutManager
         setRecyclerViewScrollListener()
         val characterActorAdapter =
-            CharacterActorListAdapter(CharacterActorListener { characterActorId ->
-
-                // item is clicked, show dialog
-
+            CharacterActorListAdapter(CharacterActorListener { characterActor ->
+                showCharacterDialog(characterActor)
             })
         recyclerView.adapter = characterActorAdapter
 
@@ -62,13 +59,44 @@ class MainFragment : Fragment() {
             })
 
 
+        viewModel.loadingStatus.observe(
+            viewLifecycleOwner,
+            Observer<MainViewModel.DataState> { loginStatus ->
+                when (loginStatus) {
+                    MainViewModel.DataState.NOT_LOADING -> {
+                        binding.progressBar.visibility = View.INVISIBLE
+                    }
+
+                    MainViewModel.DataState.LOADED -> {
+                        binding.progressBar.visibility = View.INVISIBLE
+                    }
+
+                    MainViewModel.DataState.LOADING -> {
+                        binding.progressBar.visibility = View.VISIBLE
+                    }
+
+                    MainViewModel.DataState.LOADING_ERROR -> {
+                        binding.progressBar.visibility = View.INVISIBLE
+                    }
+
+                    else -> {
+                    }
+                }
+            })
+
         return binding.root
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    private fun showCharacterDialog(characterActor: CharacterActor) {
+        val builder: AlertDialog.Builder? = activity?.let {
+            AlertDialog.Builder(it)
+        }
+        builder?.setMessage(characterActor.location.name)
+            ?.setTitle(characterActor.name)
+            ?.setPositiveButton(getString(R.string.ok)) { dialog, _ -> dialog.dismiss() }
+        val dialog: AlertDialog? = builder?.create()
+        dialog?.show()
     }
-
 
     private fun setRecyclerViewScrollListener() {
         scrollListener = object : RecyclerView.OnScrollListener() {
