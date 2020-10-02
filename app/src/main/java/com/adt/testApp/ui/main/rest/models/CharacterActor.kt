@@ -7,6 +7,7 @@ class CharacterActor(
     val species: String,
     val type: String,
     val gender: String,
+    val location: Location,
     val image:String?
 ) {
 
@@ -14,4 +15,10 @@ class CharacterActor(
     get(){
         return "Status: $status,  Species: $species"
     }
+
+    class Location(
+        val name: String,
+        val url: String
+    ){}
+
 }
