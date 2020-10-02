@@ -20,7 +20,7 @@ class MainViewModel : ViewModel() {
     }
     private var totalCharacterActors: Int = 1
     private var next: String? = null
-    private var nextPage: Int = 1
+    private var nextPage: Int = 0
     private var bEndOfList = false
 
     // The login status - true when user is logged in, false when not logged in.
