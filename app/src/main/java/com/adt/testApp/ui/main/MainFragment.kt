@@ -106,7 +106,7 @@ class MainFragment : Fragment() {
                 val firstVisibleItemPosition: Int =
                     linearLayoutManager.findFirstVisibleItemPosition()
                 val lastVisibleItemPosition = firstVisibleItemPosition + visibleItemCount
-                viewModel.setRecyclerPosition(firstVisibleItemPosition, lastVisibleItemPosition)
+                viewModel.loadPage(lastVisibleItemPosition)
             }
         }
         recyclerView.addOnScrollListener(scrollListener)

@@ -1,5 +1,6 @@
 package com.adt.testApp.ui.main
 
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -18,8 +19,9 @@ class MainViewModel : ViewModel() {
         LOADING_ERROR
     }
     private var totalCharacterActors: Int = 1
-    private var lastVisibleItemPosition: Int = 0
-    private var firstVisibleItemPosition: Int = 0
+    private var next: String? = null
+    private var nextPage: Int = 0
+    private var bEndOfList = false
 
     // The login status - true when user is logged in, false when not logged in.
     private val _loadingStatus = MutableLiveData<DataState>()
@@ -39,15 +41,26 @@ class MainViewModel : ViewModel() {
     // the Coroutine runs using the Main (UI) dispatcher
     private val coroutineScope = CoroutineScope(viewModelJob + Dispatchers.Main)
 
-    private fun loadCharacterActors(limit:Int, offset:Int){
+    private fun loadCharacterActors(offset:Int){
         _loadingStatus.value = DataState.LOADING
         coroutineScope.launch {
             // Get the Deferred object for our Retrofit request
-            val characterListDeferred = ADTApi.retrofitService.getcharacterAsync()
+            val characterListDeferred = ADTApi.retrofitService.getcharacterAsync(nextPage)
             try {
                 // this will run on a thread managed by Retrofit
                 val result = characterListDeferred.await()
                 totalCharacterActors = result.results.count()
+                next = result.info.next
+                if( next== null){
+                    bEndOfList = true
+                } else {
+                    val uri: Uri = Uri.parse(next)
+                    val pageString = uri.getQueryParameter("page")
+                    if (!pageString.isNullOrEmpty()) {
+                        nextPage = pageString.toInt()
+                    }
+
+                }
                 if(offset==0){
                     cachedCharacterActorArrayList.clear()
                 }
@@ -61,19 +74,17 @@ class MainViewModel : ViewModel() {
     }
 
 
-    fun setRecyclerPosition(firstVisibleItemPosition: Int, lastVisibleItemPosition: Int) {
-        this.firstVisibleItemPosition = firstVisibleItemPosition
-        this.lastVisibleItemPosition = lastVisibleItemPosition
-        if(lastVisibleItemPosition >= cachedCharacterActorArrayList.size && lastVisibleItemPosition < totalCharacterActors){
+    fun loadPage(lastVisibleItemPosition: Int) {
+        if(lastVisibleItemPosition >= cachedCharacterActorArrayList.size && !bEndOfList){
             if(_loadingStatus.value != DataState.LOADING) {
-                loadCharacterActors(50, cachedCharacterActorArrayList.size)
+                loadCharacterActors(cachedCharacterActorArrayList.size)
             }
         }
     }
 
     fun resume() {
         if(cachedCharacterActorArrayList.isEmpty() ) {
-            loadCharacterActors(50,0)
+            loadCharacterActors(0)
         } else {
             _characterActorList.value = cachedCharacterActorArrayList.toList()
         }

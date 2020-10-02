@@ -51,7 +51,9 @@ private val retrofit = Retrofit.Builder()
 interface ApiService {
 
     @GET("character")
-    fun getcharacterAsync(): Deferred<ApiResponse>
+    fun getcharacterAsync(
+        @Query("page") page: Int
+        ): Deferred<ApiResponse>
 
 }
 
